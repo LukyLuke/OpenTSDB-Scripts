@@ -1,0 +1,48 @@
+# coding=utf-8
+
+GlobalAuthData = {
+	'username': '',
+	'password': ''
+}
+
+openTSDB = {
+	'host': '127.0.0.1',
+	'port': 4242
+}
+
+Jira = {
+	'username': GlobalAuthData['username'],
+	'password': GlobalAuthData['password'],
+
+	'host': 'https://jira.example.com',
+
+	'metrics_base': 'bugs.jira.',
+	'metrics_host': 'jira.example.com',
+
+	'jql_team': 'issuetype = Bug AND status was in ("Ready to Develope", Development, Testing) on ${DATE}',
+	'jql_new': 'issuetype = Bug AND status changed to "Ready to Develope" on ${DATE}',
+	'jql_closed': 'issuetype = Bug AND status changed to (Closed, Resolved) on ${DATE} AND status was Testing on ${DATE}',
+	'jql_total': 'issuetype = Bug AND category in ("Customers", "Development") AND status was not in (Resolved, Closed) on ${DATE}',
+
+	'field_prio': 'priority',
+	'field_team': 'customfield_10510',
+	'field_customer': 'customfield_12910',
+	'field_category': 'customfield_11310'
+}
+
+SonarQube = {
+	'username': GlobalAuthData['username'],
+	'password': GlobalAuthData['password'],
+	
+	'host': 'https://codeanalysis.example.com/api',
+	
+	'metrics_base': 'coverage',
+	'metrics_host': 'codeanalysis.example.com',
+	'metrics_project_tag': 'project',
+	
+	'use_oldsonar': False,
+	'combine_projects': {
+		'ProjectOne': [ 'project:name-one-impl:release', 'project:name-one-api:release', 'project:name-one-domain:release' ],
+		'ProjectTwo': [ 'project:name-two-impl:release', 'project:name-two-api:release', 'project:name-two-domain:release' ]
+	}
+}
