@@ -109,3 +109,44 @@ SonarQube = {
 If you use a SonarQube-Version older than 6.0 or so, you have to use the *use_oldsonar* and also define the projects and summarisation by yourself in *combine_projects*.
 If you use a newer Sonar, the Portfolios are read out and the Projects are grouped automatically.
 
+# Run in a Container
+
+You always should build your own images due to the configuration.
+The images are for Docker and Podman as well.
+
+Both Containers use the same Environment variables:
+
+* **OPENTSDB_HOST**: Host or IP where OpenTSDB listens (default: 127.0.0.1).
+* **OPENTSDB_PORT**: Port on which OpenTSDB listens (default: 4242).
+* **AUTH_USERNAME**: Username for authenticate on Jira/Sonar.
+* **AUTH_PASSWORD**: Password for authentication.
+* **FETCH_NUM_DAYS**: The default number of days (or a date) for fetching - Normally set this to 1 but you can use it initially with a bigger value.
+
+If you not define a variable, the ones from the config.py file are used. So these values here override the configuration on runtime.
+
+
+## Jira in the Container
+
+Build the image:
+```bash
+$ podman build -t jiraopentsdb  -f Dockerfile.jira .
+```
+
+Run the image:
+```bash
+$ podman run -it --rm --name jiraopentsdb jiraopentsdb
+$ podman run -it --rm --name jiraopentsdb -e OPENTSDB_HOST=opentsdb -e AUTH_USERNAME=JiraFoo -e AUTH_PASSWORD=JiraBar jiraopentsdb
+```
+
+## Sonar in the Container
+
+Build the image:
+```bash
+$ podman build -t sonaropentsdb  -f Dockerfile.sonar .
+```
+
+Run the image:
+```bash
+$ podman run -it --rm --name sonaropentsdb sonaropentsdb
+$ podman run -it --rm --name sonaropentsdb -e OPENTSDB_HOST=opentsdb -e AUTH_USERNAME=SonarFoo -e AUTH_PASSWORD=SonarBar sonaropentsdb
+```
