@@ -76,7 +76,7 @@ def getFieldValues(cache, tag, fields):
 				cache[tag][fname] = 0
 			cache[tag][fname] += 1
 
-metrics = potsdb.Client(config.openTSDB['host'], port = config.openTSDB['port'], check_host = False)
+metrics = potsdb.Client(config.openTSDB['host'], port = config.openTSDB['port'], check_host = True)
 while utc_date.date() != now_last:
 	utc_date = utc_date + timedelta(days=1)
 	timestamp = str((utc_date.toordinal() - date(1970, 1, 1).toordinal()) * 86400)

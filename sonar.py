@@ -56,8 +56,11 @@ if not(use_oldsonar):
 			                                 auth = (config.SonarQube['username'], config.SonarQube['password']),
 			                                 headers = {"Content-Type": "application/json"})
 			if (response_projects.ok):
+				print('Portfolio: ' + portf['key'])
 				for prj in response_projects.json()['components']:
+					print('	' + prj['refKey'])
 					combine_projects[portf['key']].append(prj['refKey'])
+				print('')
 			else:
 				print("Error while getting projects: " + response_projects.reason)
 				raise SystemExit(6)
@@ -65,7 +68,9 @@ if not(use_oldsonar):
 		print("Error while getting portfolios: " + response_portfolio.reason)
 		raise SystemExit(6)
 
-metrics = potsdb.Client(config.openTSDB['host'], port = config.openTSDB['port'], check_host = False)
+regex = re.compile('[^a-zA-Z0-9]+')
+
+metrics = potsdb.Client(config.openTSDB['host'], port = config.openTSDB['port'], check_host = True)
 url = Template(coverage if not(use_oldsonar) else oldsonar_host)
 for identifier, projects in combine_projects.items():
 	for project in projects:
@@ -76,17 +81,12 @@ for identifier, projects in combine_projects.items():
 			for entry in getEntriesFromResponse(response.json()):
 				d = getDateFromEntry(entry)
 				val = getValueFromEntry(entry)
-				print("")
-				print("####################")
-				print("# Date: " + d.date().strftime('%Y-%m-%d'))
-				print("####################")
-				
 				tags = {
 					'host': config.SonarQube['metrics_host'],
 					'timestamp': str((d.toordinal() - date(1970, 1, 1).toordinal()) * 86400)
 				}
-				tags[config.SonarQube['metrics_project_tag']] = project
-				print('Tags: ' + str(tags))
+				tags[config.SonarQube['metrics_project_tag']] = regex.sub('_', project)
+				print(str(tags))
 				print('    ' + config.SonarQube['metrics_base'] + '.' + identifier + ' = ' + str(val))
 				metrics.log(config.SonarQube['metrics_base'] + '.' + identifier, val, **tags)
 
