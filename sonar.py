@@ -1,4 +1,5 @@
 # coding=utf-8
+import os
 import sys
 import time
 import potsdb
@@ -12,18 +13,26 @@ from datetime import timedelta
 
 import config
 
-if len(sys.argv) < 2:
+num_env = os.getenv('FETCH_NUM_DAYS', '') if len(sys.argv) < 2 else sys.argv[1]
+
+if len(num_env) == 0:
 	print('Give the start date as first argument: ' + sys.argv[0] + ' 2017-08-03')
 	print('         or the number of day in past: ' + sys.argv[0] + ' 10')
 	sys.exit()
 
+config.openTSDB['host'] = config.openTSDB['host'] if os.getenv('OPENTSDB_HOST', 'None') == 'None' else os.getenv('OPENTSDB_HOST', '127.0.0.1')
+config.openTSDB['port'] = config.openTSDB['port'] if os.getenv('OPENTSDB_PORT', 'None') == 'None' else int(os.getenv('OPENTSDB_PORT', '4242'))
+
+config.GlobalAuthData['username'] = config.GlobalAuthData['username'] if os.getenv('AUTH_USERNAME', 'None') == 'None' else os.getenv('AUTH_USERNAME', '')
+config.GlobalAuthData['password'] = config.GlobalAuthData['password'] if os.getenv('AUTH_PASSWORD', 'None') == 'None' else os.getenv('AUTH_PASSWORD', '')
+
 metrics = potsdb.Client(config.openTSDB['host'], port = config.openTSDB['port'], check_host = True)
 
 utc_date = None
-if '-' in sys.argv[1]:
-	utc_date = datetime(*(time.strptime(sys.argv[1], '%Y-%m-%d')[0:6]))
+if '-' in num_env:
+	utc_date = datetime(*(time.strptime(num_env, '%Y-%m-%d')[0:6]))
 else:
-	utc_date = datetime.now() - timedelta(days=int(sys.argv[1]))
+	utc_date = datetime.now() - timedelta(days=int(num_env))
 
 use_oldsonar = config.SonarQube['use_oldsonar']
 oldsonar_host = config.SonarQube['host'] + '/timemachine?resource=${PROJECT}&metrics=coverage&fromDateTime=${DATE}T00:00:00%2B0200'
