@@ -4,7 +4,6 @@ import time
 import potsdb
 import json
 import re
-import hashlib
 import requests
 from string import Template
 from datetime import date
@@ -17,6 +16,8 @@ if len(sys.argv) < 2:
 	print('Give the start date as first argument: ' + sys.argv[0] + ' 2017-08-03')
 	print('         or the number of day in past: ' + sys.argv[0] + ' 10')
 	sys.exit()
+
+metrics = potsdb.Client(config.openTSDB['host'], port = config.openTSDB['port'], check_host = True)
 
 utc_date = None
 if '-' in sys.argv[1]:
@@ -70,7 +71,6 @@ if not(use_oldsonar):
 
 regex = re.compile('[^a-zA-Z0-9]+')
 
-metrics = potsdb.Client(config.openTSDB['host'], port = config.openTSDB['port'], check_host = True)
 url = Template(coverage if not(use_oldsonar) else oldsonar_host)
 for identifier, projects in combine_projects.items():
 	for project in projects:

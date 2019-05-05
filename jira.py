@@ -17,6 +17,8 @@ if len(sys.argv) < 2:
 	print('			or the number of day in past: ' + sys.argv[0] + ' 10')
 	sys.exit()
 
+metrics = potsdb.Client(config.openTSDB['host'], port = config.openTSDB['port'], check_host = True)
+
 now_last = datetime.now().date()
 utc_date = None
 
@@ -76,7 +78,6 @@ def getFieldValues(cache, tag, fields):
 				cache[tag][fname] = 0
 			cache[tag][fname] += 1
 
-metrics = potsdb.Client(config.openTSDB['host'], port = config.openTSDB['port'], check_host = True)
 while utc_date.date() != now_last:
 	utc_date = utc_date + timedelta(days=1)
 	timestamp = str((utc_date.toordinal() - date(1970, 1, 1).toordinal()) * 86400)
