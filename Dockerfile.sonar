@@ -1,5 +1,12 @@
 FROM python:3-slim
 
+ENV OPENTSDB_HOST None
+ENV OPENTSDB_PORT None
+ENV AUTH_USERNAME None
+ENV AUTH_PASSWORD None
+
+ENV FETCH_NUM_DAYS 1
+
 WORKDIR /usr/src/app
 
 COPY requirements.txt ./
@@ -8,4 +15,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY config.py .
 COPY sonar.py .
 
-CMD [ "python", "./sonar.py", "1" ]
+CMD [ "python", "./sonar.py" ]
